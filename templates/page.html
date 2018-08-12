@@ -1,0 +1,13 @@
+{{template "header" $}}
+
+<main id="main">
+  <div class="m-page-content">
+    {{$.content}}
+  </div>
+</main>
+
+<footer class="m-page-footer">
+  Last edited by <strong>{{$.lastCommit.Committer.Name}}</strong>, <time>{{$.lastCommit.Committer.When}}</time>
+</footer>
+
+{{template "footer" $}}

@@ -1,0 +1,30 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{{$.pageTitle}}</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <a class="a-aria-skip" href="#main">Skip to main content</a>
+
+    <header class="m-page-header">
+      <h1 class="m-page-header__title">{{$.pageTitle}}</h1>
+      <nav class="m-page-header__nav">
+        <ul class="m-page-header__nav-list">
+          <li class="m-page-header__nav-list-item">
+            <a class="m-page-header__nav-list-item-link" href="/">
+              Home
+            </a>
+          </li>
+          <li class="m-page-header__nav-list-item">
+            <a class="m-page-header__nav-list-item-link" href="/pages/">
+              All
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+{{end}}

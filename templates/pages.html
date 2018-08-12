@@ -1,0 +1,20 @@
+{{template "header" $}}
+
+<main id="main">
+  <ul class="m-breadcrumb">
+    {{range $.breadcrumb}}
+      <li class="m-breadcrumb__item"><a href="{{.Linkpath}}">{{.Title}}</a></li>
+    {{end}}
+  </ul>
+
+  <ul>
+    {{range $.directories}}
+      <li>📁 <a href="{{.Linkpath}}">{{.Title}}</a></li>
+    {{end}}
+    {{range $.pages}}
+      <li>📃 <a href="{{.Linkpath}}">{{.Title}}</a></li>
+    {{end}}
+  </ul>
+</main>
+
+{{template "footer" $}}

@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "NODE_ENV=production postcss app.scss -o ../static/app.css"
+  },
+  "devDependencies": {
+    "@csstools/postcss-sass": "^2.0.0",
+    "autoprefixer": "^9.1.0",
+    "css-mqpacker": "^7.0.0",
+    "cssnano": "^4.0.5",
+    "postcss-cli": "^6.0.0"
+  }
+}
