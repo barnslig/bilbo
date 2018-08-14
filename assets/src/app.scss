@@ -53,6 +53,10 @@ main {
     text-decoration: none;
     transform: translateX(-100%);
     opacity: 0;
+
+    @media print {
+      display: none;
+    }
   }
 
   &:hover &__anchor,
@@ -131,6 +135,10 @@ main {
     list-style: none;
     margin: 0;
     padding: 0;
+
+    @media print {
+      display: none;
+    }
   }
 
   &__nav-list-item {
