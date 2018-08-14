@@ -68,6 +68,13 @@ func (b *Bilbo) RenderPage(page *Page) (err error) {
 
 	var f func(*html.Node)
 	f = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.DataAtom == atom.Body {
+			// blackfriday wraps the rendered HTML with <html><body> etc, remove it
+			n.DataAtom = atom.Article
+			n.Data = "article"
+			doc = n
+		}
+
 		if n.Type == html.ElementNode && !firstHeadlineFound && n.DataAtom == atom.H1 {
 			// Extract text from first headline node
 			firstHeadlineFound = true
