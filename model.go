@@ -102,7 +102,7 @@ func (b *Bilbo) getPageAtCommit(fileName string, withLastCommit bool, commit plu
 	}
 	defer iter.Close()
 
-	cleanFileName := normalizePageLink(strings.TrimSuffix(fileName, path.Ext(fileName)), false)
+	cleanFileName := normalizePageLink(fileName, false)
 
 	var (
 		file     *object.File

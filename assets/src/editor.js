@@ -62,7 +62,7 @@ class Editor {
         message: this.ui.message.value,
       })
       .then(response => {
-        window.location = `/${this.ui.self.dataset.filepath}`;
+        window.location = this.ui.self.dataset.linkpath;
       });
   }
 
