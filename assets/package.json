@@ -1,12 +1,29 @@
 {
   "scripts": {
-    "build": "NODE_ENV=production postcss app.scss -o ../static/app.css"
+    "start": "npm run watch:css & npm run watch:js",
+    "build": "npm run build:css; npm run build:js",
+    "watch:css": "postcss src/app.scss -w -o ../static/app.css",
+    "build:css": "NODE_ENV=production postcss src/app.scss -o ../static/app.css",
+    "watch:js": "webpack --mode development --progress -w",
+    "build:js": "webpack --mode production --progress"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/plugin-syntax-dynamic-import": "^7.0.0-rc.1",
+    "@babel/preset-env": "^7.0.0-rc.1",
     "@csstools/postcss-sass": "^2.0.0",
     "autoprefixer": "^9.1.0",
+    "babel-loader": "^8.0.0-beta",
+    "css-loader": "^1.0.0",
     "css-mqpacker": "^7.0.0",
     "cssnano": "^4.0.5",
-    "postcss-cli": "^6.0.0"
+    "postcss-cli": "^6.0.0",
+    "style-loader": "^0.22.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "codemirror": "^5.39.2"
   }
 }

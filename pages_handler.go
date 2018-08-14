@@ -60,9 +60,10 @@ func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	b.renderTemplate(w, r, "pages.html", map[string]interface{}{
-		"pageTitle":   pageTitle,
 		"breadcrumb":  breadcrumb,
 		"directories": directories,
+		"pageLayout":  "pages",
 		"pages":       pages,
+		"pageTitle":   pageTitle,
 	})
 }

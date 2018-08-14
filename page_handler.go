@@ -26,8 +26,11 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	b.renderTemplate(w, r, "page.html", map[string]interface{}{
-		"lastCommit": page.LastCommit,
 		"content":    template.HTML(string(page.Rendered)),
+		"isPage":     true,
+		"lastCommit": page.LastCommit,
+		"page":       page,
+		"pageLayout": "page",
 		"pageTitle":  page.Title,
 	})
 }

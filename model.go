@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/filemode"
@@ -9,7 +10,9 @@ import (
 	"io/ioutil"
 	"net/url"
 	"path"
+	"path/filepath"
 	"strings"
+	"time"
 )
 
 func (b *Bilbo) getPageHistory(fileName string, onlyLast bool) (commits []*object.Commit, err error) {
@@ -211,6 +214,63 @@ func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (direc
 			pages = append(pages, page)
 		}
 	}
+
+	return
+}
+
+func (b *Bilbo) updatePage(fileName string, data string, message string) (err error) {
+	pageFilePath := fileName
+
+	// Make sure the file has an extension
+	// TODO file type switch
+	ext := filepath.Ext(pageFilePath)
+	if ext != ".md" && ext != ".markdown" {
+		pageFilePath = fmt.Sprintf("%s.%s", pageFilePath, "md")
+	}
+
+	// Make a safe file path
+	base, err := filepath.Abs(b.cfg.DataDir)
+	if err != nil {
+		return
+	}
+
+	orig, err := filepath.Abs(filepath.Join(b.cfg.DataDir, pageFilePath))
+	if err != nil {
+		return
+	}
+
+	if !strings.HasPrefix(orig, base) {
+		err = fmt.Errorf("Path breaks out of data directory")
+		return
+	}
+
+	// Write to file
+	// TODO configurable permission mode
+	err = ioutil.WriteFile(orig, []byte(data), 0644)
+	if err != nil {
+		return
+	}
+
+	// Stage file
+	wt, err := b.repo.Worktree()
+	if err != nil {
+		return
+	}
+
+	_, err = wt.Add(pageFilePath)
+	if err != nil {
+		return
+	}
+
+	// Create commit
+	// TODO author from config
+	_, err = wt.Commit(message, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Anonymous",
+			Email: "anon@anon.com",
+			When:  time.Now(),
+		},
+	})
 
 	return
 }

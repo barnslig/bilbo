@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="csrf-token" content="{{$.csrfToken}}" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{{$.pageTitle}}</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body class="l-{{$.pageLayout}}">
+    <div class="o-editor" data-editor data-filepath="{{$.page.Filepath}}">
+      <div class="m-editor-header">
+        <div class="m-editor-header__nav">
+          <a class="a-btn m-editor-header__nav-btn" href="{{$.page.Linkpath}}">← go back</a>
+          <a class="a-btn m-editor-header__nav-btn" target="_blank" rel="noopener noreferrer" href="https://guides.github.com/features/mastering-markdown/">🤔 help</a>
+          <div class="m-editor-header__loader m-editor-header__loader--visible" data-editor-loader></div>
+        </div>
+        <form class="m-editor-header__form" data-editor-form>
+          <div class="a-input m-editor-header__form-input">
+            <label class="a-input__label" for="commit-message">Commit message</label>
+            <input class="a-input__input" id="commit-message" type="text" value="Updated {{$.page.Title}}" required data-editor-message />
+          </div>
+          <button type="submit" class="a-btn">save</button>
+        </form>
+      </div>
+      <div class="o-editor__sidebyside">
+        <div class="o-editor__editor">
+          <textarea disabled data-editor-edit>{{$.source}}</textarea>
+        </div>
+        <div class="m-page-content o-editor__preview" data-editor-preview></div>
+      </div>
+    </div>
+    <script src="/static/app.js" async></script>
+  </body>
+</html>
