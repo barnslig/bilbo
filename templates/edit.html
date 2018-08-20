@@ -11,14 +11,14 @@
     <div class="o-editor" data-editor data-filepath="{{$.page.Filepath}}" data-linkpath="{{$.page.Linkpath}}">
       <div class="m-editor-header">
         <div class="m-editor-header__nav">
-          <a class="a-btn m-editor-header__nav-btn" href="{{$.page.Linkpath}}">← go back</a>
+          <a class="a-btn m-editor-header__nav-btn" href="{{if $.page.Linkpath}}{{$.page.Linkpath}}{{else}}/{{end}}">← go back</a>
           <a class="a-btn m-editor-header__nav-btn" target="_blank" rel="noopener noreferrer" href="https://guides.github.com/features/mastering-markdown/">🤔 help</a>
           <div class="m-editor-header__loader m-editor-header__loader--visible" data-editor-loader></div>
         </div>
         <form class="m-editor-header__form" data-editor-form>
-          <div class="a-input m-editor-header__form-input">
+          <div class="a-input a-input--hidden-label m-editor-header__form-input">
             <label class="a-input__label" for="commit-message">Commit message</label>
-            <input class="a-input__input" id="commit-message" type="text" value="Updated {{$.page.Title}}" required data-editor-message />
+            <input class="a-input__input" id="commit-message" type="text" value="{{$.commitMsg}}" required autocomplete="off" data-editor-message />
           </div>
           <button type="submit" class="a-btn">save</button>
         </form>

@@ -25,11 +25,17 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	pageFolder := path.Dir(page.Linkpath)
+	if pageFolder == "/" {
+		pageFolder = ""
+	}
+
 	b.renderTemplate(w, r, "page.html", hash{
 		"content":    template.HTML(string(page.Rendered)),
 		"isPage":     true,
 		"lastCommit": page.LastCommit,
 		"page":       page,
+		"pageFolder": pageFolder,
 		"pageLayout": "page",
 		"pageTitle":  page.Title,
 	})

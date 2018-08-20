@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
+	"io"
 	"net/http"
+	"path"
 )
 
 type EditData struct {
@@ -36,10 +38,23 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 
 	page, err := b.getPage(vars["page"], true)
 	if err != nil {
-		panic(err)
+		if err == io.EOF {
+			page = &Page{
+				Filepath: vars["page"],
+				Title:    normalizePageLink(vars["page"], false),
+			}
+		} else {
+			panic(err)
+		}
+	}
+
+	commitMsg := fmt.Sprintf("Updated %s", page.Title)
+	if len(page.Source) == 0 {
+		commitMsg = fmt.Sprintf("Created %s", page.Title)
 	}
 
 	b.renderTemplate(w, r, "edit.html", hash{
+		"commitMsg":  commitMsg,
 		"page":       page,
 		"pageLayout": "editor",
 		"pageTitle":  fmt.Sprintf("Edit page \"%s\"", page.Title),
@@ -72,4 +87,32 @@ func (b *Bilbo) HandleEditPreview(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/html")
 	w.Write(page.Rendered)
+}
+
+func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			panic(err)
+		}
+
+		folder := r.PostFormValue("page-folder")
+		name := r.PostFormValue("page-name")
+		if !path.IsAbs(name) {
+			name = path.Join(folder, name)
+		}
+		name = normalizePageLink(name, true)
+
+		http.Redirect(w, r, path.Join("/edit/", name), http.StatusMovedPermanently)
+		return
+	}
+
+	vars := mux.Vars(r)
+	folder := normalizePageLink(vars["folder"], true)
+
+	b.renderTemplate(w, r, "edit_new.html", hash{
+		"folder":     folder,
+		"pageLayout": "form",
+		"pageTitle":  "Create new page",
+	})
 }

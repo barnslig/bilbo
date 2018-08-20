@@ -44,6 +44,8 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	// Create HTTP routes
 	b.mux = mux.NewRouter()
 	b.mux.HandleFunc("/", b.HandleIndex).Methods("GET").Name("index")
+	b.mux.HandleFunc("/edit/_new", b.HandleEditNew).Methods("GET", "POST").Name("editNewRoot")
+	b.mux.HandleFunc("/edit/{folder:.*}/_new", b.HandleEditNew).Methods("GET").Name("editNew")
 	b.mux.HandleFunc("/edit/_preview", b.HandleEditPreview).Methods("POST").Name("editPreview")
 	b.mux.HandleFunc("/edit/{page:.*}", b.HandleEdit).Methods("GET", "POST").Name("edit")
 	b.mux.HandleFunc("/pages/", b.HandlePages).Methods("GET").Name("pagesIndex")

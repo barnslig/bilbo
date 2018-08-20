@@ -25,9 +25,14 @@
               All
             </a>
           </li>
+          <li class="m-page-header__nav-list-item">
+            <a class="a-btn" href="/edit{{$.pageFolder}}/_new">
+              New
+            </a>
+          </li>
           {{if $.isPage}}
             <li class="m-page-header__nav-list-item">
-              <a class="a-btn" href="/edit/{{$.page.Linkpath}}">
+              <a class="a-btn" href="/edit{{$.page.Linkpath}}">
                 Edit
               </a>
             </li>

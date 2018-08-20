@@ -59,9 +59,15 @@ func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	pageFolder := path.Clean(path.Join("/", vars["folder"]))
+	if pageFolder == "/" {
+		pageFolder = ""
+	}
+
 	b.renderTemplate(w, r, "pages.html", hash{
 		"breadcrumb":  breadcrumb,
 		"directories": directories,
+		"pageFolder":  pageFolder,
 		"pageLayout":  "pages",
 		"pages":       pages,
 		"pageTitle":   pageTitle,
