@@ -1,6 +1,6 @@
 import Axios from 'axios';
-import CodeMirror from 'codemirror';
 
+import CodeMirror from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/gfm/gfm';
 import 'codemirror/theme/monokai.css';
@@ -19,6 +19,7 @@ class Editor {
       self: $elem,
     };
 
+    this.isDirty = false;
     this.isUpdating = false;
     this.lastContent = '';
 
@@ -30,7 +31,13 @@ class Editor {
       theme: 'monokai',
     });
 
+    this.cm.on('changes', () => {
+      this.isDirty = true;
+    })
+
     this.ui.form.addEventListener('submit', this.onSubmit.bind(this));
+
+    window.addEventListener('beforeunload', this.onUnload.bind(this));
 
     setInterval(this.onUpdatePreview.bind(this), 1000);
     this.onUpdatePreview();
@@ -51,6 +58,15 @@ class Editor {
     }
   }
 
+  onUnload(ev) {
+    if (this.isDirty) {
+      ev.preventDefault();
+      const msg = 'Leave page and destroy changes?';
+      event.returnValue = msg;
+      return msg;
+    }
+  }
+
   onSubmit(ev) {
     ev.preventDefault();
 
@@ -62,6 +78,7 @@ class Editor {
         message: this.ui.message.value,
       })
       .then(response => {
+        this.isDirty = false;
         window.location = this.ui.self.dataset.linkpath;
       });
   }
@@ -85,6 +102,8 @@ class Editor {
           this.isUpdating = false;
           this.ui.preview.innerHTML = response.data;
         });
+    } else {
+      this.isLoading = false;
     }
   }
 }
