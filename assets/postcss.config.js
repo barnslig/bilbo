@@ -10,6 +10,7 @@ module.exports = {
     sass(),
     pxtorem({
       propList: ['*'],
+      selectorBlackList: ['html'],
     }),
     autoprefixer(),
     mqpacker({
