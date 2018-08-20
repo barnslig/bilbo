@@ -59,7 +59,7 @@ func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	b.renderTemplate(w, r, "pages.html", map[string]interface{}{
+	b.renderTemplate(w, r, "pages.html", hash{
 		"breadcrumb":  breadcrumb,
 		"directories": directories,
 		"pageLayout":  "pages",

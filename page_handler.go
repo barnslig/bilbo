@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
+	"path"
 )
 
 func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
@@ -11,7 +12,7 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 
 	normalizedLink := normalizePageLink(vars["page"], false)
 	if normalizedLink != vars["page"] {
-		http.Redirect(w, r, "/" + normalizedLink, http.StatusMovedPermanently)
+		http.Redirect(w, r, path.Join("/", normalizedLink), http.StatusMovedPermanently)
 	}
 
 	page, err := b.getPage(vars["page"], true)
@@ -24,7 +25,7 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	b.renderTemplate(w, r, "page.html", map[string]interface{}{
+	b.renderTemplate(w, r, "page.html", hash{
 		"content":    template.HTML(string(page.Rendered)),
 		"isPage":     true,
 		"lastCommit": page.LastCommit,

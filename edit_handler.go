@@ -39,7 +39,7 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	b.renderTemplate(w, r, "edit.html", map[string]interface{}{
+	b.renderTemplate(w, r, "edit.html", hash{
 		"page":       page,
 		"pageLayout": "editor",
 		"pageTitle":  fmt.Sprintf("Edit page \"%s\"", page.Title),

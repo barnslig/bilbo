@@ -61,9 +61,11 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	return
 }
 
-func (b *Bilbo) renderTemplate(w http.ResponseWriter, r *http.Request, templateFile string, localData map[string]interface{}) {
+type hash map[string]interface{}
+
+func (b *Bilbo) renderTemplate(w http.ResponseWriter, r *http.Request, templateFile string, localData hash) {
 	// Global template data
-	data := map[string]interface{}{
+	data := hash{
 		"csrfToken":      csrf.Token(r),
 		csrf.TemplateTag: csrf.TemplateField(r),
 	}

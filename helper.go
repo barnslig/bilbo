@@ -1,8 +1,8 @@
 package main
 
 import (
-	"strings"
 	"path"
+	"strings"
 )
 
 func normalizePageLink(link string, withRootPrefix bool) string {
