@@ -49,6 +49,7 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	b.mux.HandleFunc("/pages/", b.HandlePages).Methods("GET").Name("pagesIndex")
 	b.mux.HandleFunc("/pages/{folder:.*}/", b.HandlePages).Methods("GET").Name("pages")
 	b.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(b.cfg.StaticDir))))
+	b.mux.HandleFunc("/{special:favicon|favicon.ico}", http.NotFound)
 	b.mux.HandleFunc("/{page:.+}", b.HandlePage).Methods("GET").Name("page")
 
 	// Apply middlewares
