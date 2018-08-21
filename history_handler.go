@@ -1,19 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"gopkg.in/src-d/go-git.v4/plumbing"
-	"html/template"
 	"net/http"
 	"path"
 )
 
-func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
+func (b *Bilbo) HandleHistory(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	normalizedLink := normalizePageLink(vars["page"], false)
 	if normalizedLink != vars["page"] {
-		redirectUrl, err := b.mux.Get("page").URL("page", normalizedLink)
+		redirectUrl, err := b.mux.Get("history").URL("page", normalizedLink)
 		if err != nil {
 			panic(err)
 		}
@@ -22,13 +22,12 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	commit := r.Context().Value("GitHead").(plumbing.Hash)
-
-	page, err := b.getPageAtCommit(vars["page"], true, commit)
+	pageHistory, err := b.getPageHistoryFromCommit(vars["page"]+".md", false, commit)
 	if err != nil {
 		panic(err)
 	}
 
-	err = b.RenderPage(page, commit)
+	page, err := b.getPageAtCommit(vars["page"], false, commit)
 	if err != nil {
 		panic(err)
 	}
@@ -38,13 +37,12 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		pageFolder = ""
 	}
 
-	b.renderTemplate(w, r, "page.html", hash{
-		"content":    template.HTML(string(page.Rendered)),
-		"isPage":     true,
-		"lastCommit": page.LastCommit,
-		"page":       page,
-		"pageFolder": pageFolder,
-		"pageLayout": "page",
-		"pageTitle":  page.Title,
+	b.renderTemplate(w, r, "history.html", hash{
+		"isPage":      true,
+		"page":        page,
+		"pageFolder":  pageFolder,
+		"pageHistory": pageHistory,
+		"pageLayout":  "commits",
+		"pageTitle":   fmt.Sprintf("History for %s", page.Title),
 	})
 }

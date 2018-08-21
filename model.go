@@ -44,6 +44,8 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 		return
 	}
 
+	fromCommitSeen := lastCommit.Hash == commit
+
 	for {
 		currentCommit, err = ci.Next()
 		if err != nil {
@@ -53,6 +55,14 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 			}
 
 			return
+		}
+
+		if !fromCommitSeen {
+			if currentCommit.Hash == commit {
+				fromCommitSeen = true
+			} else {
+				continue
+			}
 		}
 
 		lastCommitFile, err = lastCommit.File(fileName)

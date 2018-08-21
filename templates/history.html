@@ -1,0 +1,16 @@
+{{template "header" $}}
+
+<main id="main">
+  <ul>
+    {{range $.pageHistory}}
+      <li>
+        <p>
+          <a href="{{$.page.Linkpath}}?commit={{.Hash}}">{{.Message}}</a>
+          <small>{{.Committer.Name}} - {{.Committer.When}}</small>
+        </p>
+      </li>
+    {{end}}
+  </ul>
+</main>
+
+{{template "footer" $}}
