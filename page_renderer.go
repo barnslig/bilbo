@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 	"gopkg.in/russross/blackfriday.v2"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"io"
 	"net/url"
 	"path"
@@ -48,7 +49,7 @@ func htmlNodeGetAttributeByKey(n *html.Node, key string) (val string, err error)
 	return
 }
 
-func (b *Bilbo) RenderPage(page *Page) (err error) {
+func (b *Bilbo) RenderPage(page *Page, commit plumbing.Hash) (err error) {
 	// Render the page according to its extension
 	ext := path.Ext(page.Filepath)
 	switch ext {
@@ -134,7 +135,7 @@ func (b *Bilbo) RenderPage(page *Page) (err error) {
 					classes = "internal"
 					link.Path = normalizePageLink(link.Path, true)
 
-					if _, err := b.getPage(link.Path, false); err != nil {
+					if _, err := b.getPageAtCommit(link.Path, false, commit); err != nil {
 						classes = "internal absent"
 					}
 				}

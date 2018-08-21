@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"path"
 	"strings"
@@ -44,7 +45,8 @@ func createBreadcrumb(mux *mux.Router, folderPath string) (hierarchy []*Folder, 
 func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	directories, pages, err := b.getPages(vars["folder"])
+	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	folderStructure, err := b.getPagesAtCommit(vars["folder"], commit)
 	if err != nil {
 		panic(err)
 	}
@@ -66,10 +68,10 @@ func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 
 	b.renderTemplate(w, r, "pages.html", hash{
 		"breadcrumb":  breadcrumb,
-		"directories": directories,
+		"directories": folderStructure.Folders,
 		"pageFolder":  pageFolder,
 		"pageLayout":  "pages",
-		"pages":       pages,
+		"pages":       folderStructure.Pages,
 		"pageTitle":   pageTitle,
 	})
 }

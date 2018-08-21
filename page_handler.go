@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"html/template"
 	"net/http"
 	"path"
@@ -15,12 +16,14 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, path.Join("/", normalizedLink), http.StatusMovedPermanently)
 	}
 
-	page, err := b.getPage(vars["page"], true)
+	commit := r.Context().Value("GitHead").(plumbing.Hash)
+
+	page, err := b.getPageAtCommit(vars["page"], true, commit)
 	if err != nil {
 		panic(err)
 	}
 
-	err = b.RenderPage(page)
+	err = b.RenderPage(page, commit)
 	if err != nil {
 		panic(err)
 	}

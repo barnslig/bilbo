@@ -40,4 +40,10 @@
         </ul>
       </nav>
     </header>
+
+    {{if not $.gitIsHead}}
+      <div class="a-alert" role="alert">
+        <p>You are currently not viewing the latest revision of this page!</p>
+      </div>
+    {{end}}
 {{end}}

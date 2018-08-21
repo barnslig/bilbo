@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"html/template"
 	"io"
 	"net/http"
@@ -36,7 +37,8 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	page, err := b.getPage(vars["page"], true)
+	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	page, err := b.getPageAtCommit(vars["page"], true, commit)
 	if err != nil {
 		if err == io.EOF {
 			page = &Page{
@@ -80,7 +82,8 @@ func (b *Bilbo) HandleEditPreview(w http.ResponseWriter, r *http.Request) {
 		Source:   []byte(data.Data),
 	}
 
-	err = b.RenderPage(page)
+	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	err = b.RenderPage(page, commit)
 	if err != nil {
 		panic(err)
 	}
