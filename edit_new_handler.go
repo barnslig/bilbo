@@ -1,0 +1,40 @@
+package main
+
+import (
+	"github.com/gorilla/mux"
+	"net/http"
+	"path"
+)
+
+func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		err := r.ParseForm()
+		if err != nil {
+			panic(err)
+		}
+
+		folder := r.PostFormValue("page-folder")
+		name := r.PostFormValue("page-name")
+		if !path.IsAbs(name) {
+			name = path.Join(folder, name)
+		}
+		name = normalizePageLink(name, true)
+
+		redirectUrl, err := b.mux.Get("edit").URL("page", name)
+		if err != nil {
+			panic(err)
+		}
+
+		http.Redirect(w, r, redirectUrl.String(), http.StatusMovedPermanently)
+		return
+	}
+
+	vars := mux.Vars(r)
+	folder := normalizePageLink(vars["folder"], true)
+
+	b.renderTemplate(w, r, "edit_new.html", hash{
+		"folder":     folder,
+		"pageLayout": "form",
+		"pageTitle":  "Create new page",
+	})
+}
