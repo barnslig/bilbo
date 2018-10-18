@@ -36,12 +36,15 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	isNewPage := false
 	commit := r.Context().Value("GitHead").(plumbing.Hash)
 	page, err := b.getPageAtCommit(vars["page"], true, commit)
 	if err != nil {
 		if err == io.EOF {
+			isNewPage = true
 			page = &Page{
-				Filepath: vars["page"],
+				Filepath: fmt.Sprintf("%s.md", vars["page"]),
+				Linkpath: vars["page"],
 				Title:    normalizePageLink(vars["page"], false),
 			}
 		} else {
@@ -49,16 +52,17 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	commitMsg := fmt.Sprintf("Updated %s", page.Title)
+	commitMsg := fmt.Sprintf("Update %s", page.Title)
 	if len(page.Source) == 0 {
-		commitMsg = fmt.Sprintf("Created %s", page.Title)
+		commitMsg = fmt.Sprintf("Create %s", page.Title)
 	}
 
 	b.renderTemplate(w, r, "edit.html", hash{
 		"commitMsg":  commitMsg,
+		"isNewPage":  isNewPage,
 		"page":       page,
 		"pageLayout": "editor",
-		"pageTitle":  fmt.Sprintf("Edit page \"%s\"", page.Title),
+		"pageTitle":  commitMsg,
 		"source":     template.HTML(string(page.Source)),
 	})
 }

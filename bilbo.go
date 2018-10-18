@@ -66,7 +66,7 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	b.hndl = b.GitMiddleware(b.hndl)
 	b.hndl = csrf.Protect([]byte(b.cfg.Secret), csrf.Secure(false))(b.hndl)
 
-	log.Printf("Now listening on %s", b.cfg.HttpListen)
+	log.Printf("Now listening on http://%s", b.cfg.HttpListen)
 	err = http.ListenAndServe(b.cfg.HttpListen, b.hndl)
 
 	return
