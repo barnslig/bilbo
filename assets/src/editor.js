@@ -16,6 +16,7 @@ class Editor {
       loader: $elem.querySelector('[data-editor-loader]'),
       message: $elem.querySelector('[data-editor-message]'),
       preview: $elem.querySelector('[data-editor-preview]'),
+      togglePreview: $elem.querySelector('[data-editor-toggle-preview]'),
       self: $elem,
     };
 
@@ -36,6 +37,7 @@ class Editor {
     })
 
     this.ui.form.addEventListener('submit', this.onSubmit.bind(this));
+    this.ui.togglePreview.addEventListener('click', this.onTogglePreview.bind(this));
 
     window.addEventListener('beforeunload', this.onUnload.bind(this));
 
@@ -81,6 +83,13 @@ class Editor {
         this.isDirty = false;
         window.location = this.ui.self.dataset.linkpath;
       });
+  }
+
+  onTogglePreview(ev) {
+    ev.preventDefault();
+
+    const className = 'o-editor--show-preview';
+    this.ui.self.classList[this.ui.self.classList.contains(className) ? 'remove' : 'add'](className);
   }
 
   onUpdatePreview() {

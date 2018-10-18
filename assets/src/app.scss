@@ -256,11 +256,32 @@ main {
 
   &__nav {
     display: flex;
-    margin: 10px;
+    width: 100%;
+    padding: 10px;
   }
 
   &__nav-btn:not(:last-child) {
     margin-right: 10px;
+  }
+
+  &__nav-btn-preview {
+    margin-left: auto;
+
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  .o-editor--show-preview &__nav-btn-preview-preview {
+    display: none;
+  }
+
+  &__nav-btn-preview-editor {
+    display: none;
+  }
+
+  .o-editor--show-preview &__nav-btn-preview-editor {
+    display: inline;
   }
 
   &__loader {
@@ -271,9 +292,13 @@ main {
     border-width: 5px;
     color: black;
     height: 25px;
-    margin: 2.5px;
+    margin: 2.5px auto;
     visibility: hidden;
     width: 25px;
+
+    @media (min-width: 768px) {
+      margin: 2.5px;
+    }
 
     &--visible {
       visibility: visible;
@@ -326,6 +351,12 @@ main {
     overflow: auto;
   }
 
+  &--show-preview &__editor {
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
   &__preview {
     display: none;
     padding: 20px 50px;
@@ -336,6 +367,12 @@ main {
 
     .a-hl__anchor {
       display: none;
+    }
+  }
+
+  &--show-preview &__preview {
+    @media (max-width: 767px) {
+      display: block;
     }
   }
 
