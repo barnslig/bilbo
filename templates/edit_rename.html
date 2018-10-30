@@ -1,0 +1,28 @@
+{{template "header" $}}
+
+<main id="main">
+  <form class="o-form" method="post" action="/edit{{$.currentPage.Linkpath}}/_rename">
+    {{$.csrfField}}
+
+    <div class="o-form__row">
+      <div class="a-input">
+        <label class="a-input__label" for="current-page-name">Current name</label>
+        <input class="a-input__input" id="current-page-name" name="current-page-name" type="text" value="{{$.currentPage.Linkpath}}" disabled />
+      </div>
+    </div>
+
+    <div class="o-form__row">
+      <div class="a-input">
+        <label class="a-input__label" for="next-page-name">New name</label>
+        <input class="a-input__input" id="next-page-name" name="next-page-name" aria-describedby="next-page-name-description" type="text" autocomplete="off" required autofocus />
+        <small class="a-input__description" id="next-page-name-description">Page will be renamed under {{$.currentFolder}} unless an absolute path is given.</small>
+      </div>
+    </div>
+
+    <div class="o-form__row">
+      <button type="submit" class="a-btn">OK</button>
+    </div>
+  </form>
+</main>
+
+{{template "footer" $}}

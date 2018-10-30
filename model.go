@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"net/url"
 	"path"
-	"path/filepath"
 	"strings"
 	"time"
 )
@@ -243,34 +242,18 @@ func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (folde
 }
 
 func (b *Bilbo) updatePage(fileName string, data string, message string) (err error) {
-	pageFilePath := fileName
-
 	// Make sure the file has an extension
-	// TODO file type switch
-	ext := filepath.Ext(pageFilePath)
-	if ext != ".md" && ext != ".markdown" {
-		pageFilePath = fmt.Sprintf("%s.%s", pageFilePath, "md")
-	}
+	pageFilePath := ensureFileNameHasExtension(fileName)
 
-	// Make a safe file path
-	base, err := filepath.Abs(b.cfg.DataDir)
+	// Make sure the file stays within our data dir
+	absPageFilePath, err := ensureSaveFilePath(pageFilePath, b.cfg.DataDir, true)
 	if err != nil {
-		return
-	}
-
-	orig, err := filepath.Abs(filepath.Join(b.cfg.DataDir, pageFilePath))
-	if err != nil {
-		return
-	}
-
-	if !strings.HasPrefix(orig, base) {
-		err = fmt.Errorf("Path breaks out of data directory")
 		return
 	}
 
 	// Write to file
 	// TODO configurable permission mode
-	err = ioutil.WriteFile(orig, []byte(data), 0644)
+	err = ioutil.WriteFile(absPageFilePath, []byte(data), 0644)
 	if err != nil {
 		return
 	}
@@ -282,6 +265,45 @@ func (b *Bilbo) updatePage(fileName string, data string, message string) (err er
 	}
 
 	_, err = wt.Add(pageFilePath)
+	if err != nil {
+		return
+	}
+
+	// Create commit
+	// TODO author from config
+	_, err = wt.Commit(message, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Anonymous",
+			Email: "anon@anon.com",
+			When:  time.Now(),
+		},
+	})
+
+	return
+}
+
+func (b *Bilbo) movePage(currentFileName string, nextFileName string, message string) (err error) {
+	// Make sure both files are within our data dir
+	absCurrentFileName, err := ensureSaveFilePath(currentFileName, b.cfg.DataDir, false)
+	if err != nil {
+		return
+	}
+
+	absNextFileName, err := ensureSaveFilePath(nextFileName, b.cfg.DataDir, false)
+	if err != nil {
+		return
+	}
+
+	// Make sure the new file has an extension
+	absNextFileName = ensureFileNameHasExtension(absNextFileName)
+
+	// Just try to move the file
+	wt, err := b.repo.Worktree()
+	if err != nil {
+		return
+	}
+
+	_, err = wt.Move(strings.TrimPrefix(absCurrentFileName, "/"), strings.TrimPrefix(absNextFileName, "/"))
 	if err != nil {
 		return
 	}

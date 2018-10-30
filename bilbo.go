@@ -53,6 +53,7 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	b.mux.HandleFunc("/edit/_new", b.HandleEditNew).Methods("GET", "POST").Name("editNewRoot")
 	b.mux.HandleFunc("/edit/{folder:.*}/_new", b.HandleEditNew).Methods("GET").Name("editNew")
 	b.mux.HandleFunc("/edit/_preview", b.HandleEditPreview).Methods("POST").Name("editPreview")
+	b.mux.HandleFunc("/edit/{page:.*}/_rename", b.HandleEditRename).Methods("GET", "POST").Name("editRename")
 	b.mux.HandleFunc("/edit/{page:.*}", b.HandleEdit).Methods("GET", "POST").Name("edit")
 	b.mux.HandleFunc("/history/{page:.*}", b.HandleHistory).Methods("GET").Name("history")
 	b.mux.HandleFunc("/pages/", b.HandlePages).Methods("GET").Name("pagesIndex")

@@ -27,7 +27,7 @@ func (b *Bilbo) HandleHistory(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	page, err := b.getPageAtCommit(vars["page"], false, commit)
+	page, _, err := b.getRequestedPage(r)
 	if err != nil {
 		panic(err)
 	}

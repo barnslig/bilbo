@@ -8,13 +8,9 @@ import (
 
 func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		err := r.ParseForm()
-		if err != nil {
-			panic(err)
-		}
+		folder := r.FormValue("page-folder")
 
-		folder := r.PostFormValue("page-folder")
-		name := r.PostFormValue("page-name")
+		name := r.FormValue("page-name")
 		if !path.IsAbs(name) {
 			name = path.Join(folder, name)
 		}
