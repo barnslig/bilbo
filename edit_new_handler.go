@@ -21,7 +21,7 @@ func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		http.Redirect(w, r, redirectUrl.String(), http.StatusMovedPermanently)
+		http.Redirect(w, r, redirectUrl.String(), http.StatusSeeOther)
 		return
 	}
 
