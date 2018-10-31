@@ -320,3 +320,34 @@ func (b *Bilbo) movePage(currentFileName string, nextFileName string, message st
 
 	return
 }
+
+func (b *Bilbo) deletePage(fileName string, message string) (err error) {
+	// Make sure file is within our data dir
+	absFileName, err := ensureSaveFilePath(fileName, b.cfg.DataDir, false)
+	if err != nil {
+		return
+	}
+
+	// Just try to delete the file
+	wt, err := b.repo.Worktree()
+	if err != nil {
+		return
+	}
+
+	_, err = wt.Remove(strings.TrimPrefix(absFileName, "/"))
+	if err != nil {
+		return
+	}
+
+	// Create commit
+	// TODO author from config
+	_, err = wt.Commit(message, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "Anonymous",
+			Email: "anon@anon.com",
+			When:  time.Now(),
+		},
+	})
+
+	return
+}

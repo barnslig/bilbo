@@ -1,0 +1,18 @@
+{{template "header" $}}
+
+<main id="main">
+  <form class="o-form" method="post" action="/edit{{$.page.Linkpath}}/_delete">
+    {{$.csrfField}}
+
+    <div class="o-form__row">
+      <p>Are you sure you want to delete <strong>{{$.page.Linkpath}}</strong>?</p>
+    </div>
+
+    <div class="o-form__button-row">
+      <a href="{{$.page.Linkpath}}" class="a-btn">No</a>
+      <button type="submit" class="a-btn">Yes</button>
+    </div>
+  </form>
+</main>
+
+{{template "footer" $}}

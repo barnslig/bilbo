@@ -83,6 +83,7 @@ main {
 }
 
 .a-btn {
+  @extend %typo-default;
   appearance: none;
   background: #f7f7f7;
   background: linear-gradient(to bottom, #f4f4f4, #ececec);
@@ -232,7 +233,11 @@ main {
   color: #999;
   font-size: 12px;
   margin: 20px 0;
-  padding-top: 10px;
+  padding: 10px 0;
+
+  p {
+    margin: 10px 0;
+  }
 }
 
 .m-breadcrumb {
@@ -418,7 +423,13 @@ main {
     max-width: 400px;
   }
 
-  &__row {
+  &__row,
+  &__button-row {
     margin-bottom: 20px;
+  }
+
+  &__button-row {
+    display: flex;
+    justify-content: space-between;
   }
 }
