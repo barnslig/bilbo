@@ -31,7 +31,7 @@ func (b *Bilbo) HandleEditRename(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		redirectUrl, err := b.mux.Get("page").URL("page", nextPageLinkpath)
+		redirectUrl, err := b.mux.Get("pages#show").URL("page", nextPageLinkpath)
 		if err != nil {
 			panic(err)
 		}

@@ -16,33 +16,33 @@
       <nav class="m-page-header__nav">
         <ul class="m-page-header__nav-list">
           <li class="m-page-header__nav-list-item">
-            <a class="a-btn" href="/">
+            <a class="a-btn" href="{{route "index"}}">
               Home
             </a>
           </li>
           <li class="m-page-header__nav-list-item">
-            <a class="a-btn" href="/pages/">
+            <a class="a-btn" href="{{route "pages#index" "folder" "/"}}">
               All
             </a>
           </li>
           <li class="m-page-header__nav-list-item">
-            <a class="a-btn" href="/edit{{$.pageFolder}}/_new">
+            <a class="a-btn" href="{{route "pages#new" "folder" $.pageFolder}}">
               New
             </a>
           </li>
           {{if $.isPage}}
             <li class="m-page-header__nav-list-item">
-              <a class="a-btn" href="/edit{{$.page.Linkpath}}">
+              <a class="a-btn" href="{{route "pages#edit" "page" $.page.Linkpath}}">
                 Edit
               </a>
             </li>
             <li class="m-page-header__nav-list-item">
-              <a class="a-btn" href="/edit{{$.page.Linkpath}}/_rename">
+              <a class="a-btn" href="{{route "pages#rename" "page" $.page.Linkpath}}">
                 Rename
               </a>
             </li>
             <li class="m-page-header__nav-list-item">
-              <a class="a-btn" href="/history{{$.page.Linkpath}}">
+              <a class="a-btn" href="{{route "pages#history" "page" $.page.Linkpath}}">
                 History
               </a>
             </li>

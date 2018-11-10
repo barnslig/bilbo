@@ -15,7 +15,7 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 
 	normalizedLink := normalizePageLink(vars["page"], false)
 	if normalizedLink != vars["page"] {
-		redirectUrl, err := b.mux.Get("page").URL("page", normalizedLink)
+		redirectUrl, err := b.mux.Get("pages#show").URL("page", normalizedLink)
 		if err != nil {
 			panic(err)
 		}

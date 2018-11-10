@@ -11,7 +11,7 @@ import (
 func createBreadcrumb(mux *mux.Router, folderPath string) (hierarchy []*Folder, err error) {
 	currentPrefix := "/"
 
-	linkpath, err := mux.Get("pagesIndex").URL()
+	linkpath, err := mux.Get("pages#index").URL("folder", "")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func createBreadcrumb(mux *mux.Router, folderPath string) (hierarchy []*Folder, 
 	}
 
 	for _, folder := range strings.Split(folderPath, "/") {
-		linkpath, err = mux.Get("pages").URL("folder", path.Join(currentPrefix, folder))
+		linkpath, err = mux.Get("pages#index").URL("folder", path.Join(currentPrefix, folder))
 		if err != nil {
 			panic(err)
 		}
@@ -45,23 +45,28 @@ func createBreadcrumb(mux *mux.Router, folderPath string) (hierarchy []*Folder, 
 func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
+	folder := ""
+	if len(vars["folder"]) > 0 {
+		folder = vars["folder"]
+	}
+
 	commit := r.Context().Value("GitHead").(plumbing.Hash)
-	folderStructure, err := b.getPagesAtCommit(vars["folder"], commit)
+	folderStructure, err := b.getPagesAtCommit(folder, commit)
 	if err != nil {
 		panic(err)
 	}
 
-	pageTitle := path.Clean(vars["folder"])
+	pageTitle := path.Clean(folder)
 	if pageTitle == "." {
 		pageTitle = "all pages"
 	}
 
-	breadcrumb, err := createBreadcrumb(b.mux, vars["folder"])
+	breadcrumb, err := createBreadcrumb(b.mux, folder)
 	if err != nil {
 		panic(err)
 	}
 
-	pageFolder := path.Clean(path.Join("/", vars["folder"]))
+	pageFolder := path.Clean(path.Join("/", folder))
 	if pageFolder == "/" {
 		pageFolder = ""
 	}

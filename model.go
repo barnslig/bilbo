@@ -217,7 +217,7 @@ func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (folde
 	)
 	for _, entry := range tree.Entries {
 		if entry.Mode == filemode.Dir {
-			linkpath, err = b.mux.Get("pages").URL("folder", path.Join(cleanFolderPath, entry.Name))
+			linkpath, err = b.mux.Get("pages#index").URL("folder", path.Join(cleanFolderPath, entry.Name))
 			if err != nil {
 				return
 			}

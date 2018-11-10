@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
@@ -42,7 +43,33 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	}
 
 	// Precompile templates
-	b.tmpl = template.Must(template.ParseGlob(path.Join(b.cfg.TemplateDir, "*.html")))
+	tmplFuncMap := template.FuncMap{
+		"route": func(viewName string, args ...interface{}) string {
+			var strArgs []string
+			for _, arg := range args {
+				if arg == nil {
+					arg = ""
+				}
+				strArgs = append(strArgs, fmt.Sprintf("%v", arg))
+			}
+
+			route, err := b.mux.Get(viewName).URL(strArgs...)
+			if err != nil {
+				return "/"
+			}
+
+			routeStr := route.String()
+			hasTrailingSlash := routeStr[len(routeStr)-1:] == "/"
+			cleanRouteStr := path.Clean(routeStr)
+
+			if hasTrailingSlash && cleanRouteStr != "/" {
+				return cleanRouteStr + "/"
+			}
+
+			return cleanRouteStr
+		},
+	}
+	b.tmpl = template.Must(template.New("").Funcs(tmplFuncMap).ParseGlob(path.Join(b.cfg.TemplateDir, "*.html")))
 
 	// Create cache
 	b.cache = cache.New(time.Hour, 10*time.Minute)
@@ -50,18 +77,20 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	// Create HTTP routes
 	b.mux = mux.NewRouter()
 	b.mux.HandleFunc("/", b.HandleIndex).Methods("GET").Name("index")
-	b.mux.HandleFunc("/edit/_new", b.HandleEditNew).Methods("GET", "POST").Name("editNewRoot")
-	b.mux.HandleFunc("/edit/{folder:.*}/_new", b.HandleEditNew).Methods("GET").Name("editNew")
-	b.mux.HandleFunc("/edit/_preview", b.HandleEditPreview).Methods("POST").Name("editPreview")
-	b.mux.HandleFunc("/edit/{page:.*}/_rename", b.HandleEditRename).Methods("GET", "POST").Name("editRename")
-	b.mux.HandleFunc("/edit/{page:.*}/_delete", b.HandleEditDelete).Methods("GET", "POST").Name("editDelete")
-	b.mux.HandleFunc("/edit/{page:.*}", b.HandleEdit).Methods("GET", "POST").Name("edit")
-	b.mux.HandleFunc("/history/{page:.*}", b.HandleHistory).Methods("GET").Name("history")
-	b.mux.HandleFunc("/pages/", b.HandlePages).Methods("GET").Name("pagesIndex")
-	b.mux.HandleFunc("/pages/{folder:.*}/", b.HandlePages).Methods("GET").Name("pages")
+
 	b.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(b.cfg.StaticDir))))
 	b.mux.HandleFunc("/{special:favicon|favicon.ico}", http.NotFound)
-	b.mux.HandleFunc("/{page:.+}", b.HandlePage).Methods("GET").Name("page")
+
+	b.mux.HandleFunc("/edit/_new/{folder:.*}", b.HandleEditNew).Methods("GET", "POST").Name("pages#new")
+	b.mux.HandleFunc("/edit/_preview", b.HandleEditPreview).Methods("POST").Name("pages#preview")
+	b.mux.HandleFunc("/edit/_rename/{page:.+}", b.HandleEditRename).Methods("GET", "POST").Name("pages#rename")
+	b.mux.HandleFunc("/edit/_delete/{page:.+}", b.HandleEditDelete).Methods("GET", "POST").Name("pages#destroy")
+	b.mux.HandleFunc("/edit/{page:.+}", b.HandleEdit).Methods("GET", "POST").Name("pages#edit")
+
+	b.mux.HandleFunc("/history/{page:.+}", b.HandleHistory).Methods("GET").Name("pages#history")
+
+	b.mux.HandleFunc("/pages/{folder:.*}", b.HandlePages).Methods("GET").Name("pages#index")
+	b.mux.HandleFunc("/{page:.+}", b.HandlePage).Methods("GET").Name("pages#show")
 
 	// Apply middlewares
 	b.hndl = RecoverMiddleware(b.mux)

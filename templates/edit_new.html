@@ -1,7 +1,7 @@
 {{template "header" $}}
 
 <main id="main">
-  <form class="o-form" method="post" action="/edit/_new">
+  <form class="o-form" method="post" action="{{route "pages#new"}}">
     {{$.csrfField}}
     <input type="hidden" name="page-folder" value="{{$.folder}}" />
 

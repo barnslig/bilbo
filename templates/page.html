@@ -8,7 +8,7 @@
 
 <footer class="m-page-footer">
   <p>Last edited by <strong>{{$.lastCommit.Committer.Name}}</strong>, <time>{{$.lastCommit.Committer.When}}</time></p>
-  <p><a href="/edit{{$.page.Linkpath}}/_delete">Delete this page</a></p>
+  <p><a href="{{route "pages#destroy" "page" $.page.Linkpath}}">Delete this page</a></p>
 </footer>
 
 {{template "footer" $}}

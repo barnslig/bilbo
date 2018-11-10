@@ -1,7 +1,7 @@
 {{template "header" $}}
 
 <main id="main">
-  <form class="o-form" method="post" action="/edit{{$.page.Linkpath}}/_delete">
+  <form class="o-form" method="post" action="{{route "pages#destroy" "page" $.page.Linkpath}}">
     {{$.csrfField}}
 
     <div class="o-form__row">

@@ -11,7 +11,7 @@
     <div class="o-editor" data-editor data-filepath="{{$.page.Filepath}}" data-linkpath="{{$.page.Linkpath}}">
       <div class="m-editor-header">
         <div class="m-editor-header__nav">
-          <a class="a-btn m-editor-header__nav-btn" href="{{if $.isNewPage}}/edit/_new{{else}}{{$.page.Linkpath}}{{end}}">← go back</a>
+          <a class="a-btn m-editor-header__nav-btn" href="{{if $.isNewPage}}{{route "pages#new"}}{{else}}{{$.page.Linkpath}}{{end}}">← go back</a>
           <a class="a-btn m-editor-header__nav-btn" target="_blank" rel="noopener noreferrer" href="https://guides.github.com/features/mastering-markdown/">🤔 help</a>
           <div class="m-editor-header__loader m-editor-header__loader--visible" data-editor-loader></div>
           <button class="a-btn m-editor-header__nav-btn m-editor-header__nav-btn-preview" data-editor-toggle-preview>

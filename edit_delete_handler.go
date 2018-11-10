@@ -18,7 +18,7 @@ func (b *Bilbo) HandleEditDelete(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		redirectUrl, err := b.mux.Get("editNewRoot").URL()
+		redirectUrl, err := b.mux.Get("pages#new").URL("folder", "")
 		if err != nil {
 			panic(err)
 		}

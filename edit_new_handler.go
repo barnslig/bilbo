@@ -16,7 +16,7 @@ func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
 		}
 		name = normalizePageLink(name, true)
 
-		redirectUrl, err := b.mux.Get("edit").URL("page", name)
+		redirectUrl, err := b.mux.Get("pages#edit").URL("page", name)
 		if err != nil {
 			panic(err)
 		}

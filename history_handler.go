@@ -13,7 +13,7 @@ func (b *Bilbo) HandleHistory(w http.ResponseWriter, r *http.Request) {
 
 	normalizedLink := normalizePageLink(vars["page"], false)
 	if normalizedLink != vars["page"] {
-		redirectUrl, err := b.mux.Get("history").URL("page", normalizedLink)
+		redirectUrl, err := b.mux.Get("pages#history").URL("page", normalizedLink)
 		if err != nil {
 			panic(err)
 		}
