@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
+	"runtime/debug"
 )
 
 func RecoverMiddleware(h http.Handler) http.Handler {
@@ -10,7 +11,9 @@ func RecoverMiddleware(h http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				http.Error(w, fmt.Sprintf("%v", err), http.StatusInternalServerError)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				log.Println(err)
+				debug.PrintStack()
 			}
 		}()
 		h.ServeHTTP(w, r)
