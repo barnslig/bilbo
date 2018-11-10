@@ -175,12 +175,14 @@ main {
 
   &__nav-list {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     list-style: none;
-    margin: 20px 0 0 0;
+    margin: 15px -5px -5px -5px;
     padding: 0;
 
     @media (min-width: 768px) {
-      margin: 0;
+      margin: -5px;
     }
 
     @media print {
@@ -189,11 +191,7 @@ main {
   }
 
   &__nav-list-item {
-    margin-left: 10px;
-
-    &:first-child {
-      margin-left: 0;
-    }
+    margin: 5px;
   }
 }
 
@@ -267,16 +265,14 @@ main {
   &__nav {
     display: flex;
     width: 100%;
-    padding: 10px;
+    padding: 10px 5px;
   }
 
-  &__nav-btn:not(:last-child) {
-    margin-right: 10px;
+  &__nav-btn {
+    margin: 0 5px;
   }
 
   &__nav-btn-preview {
-    margin-left: auto;
-
     @media (min-width: 768px) {
       display: none;
     }
@@ -318,20 +314,24 @@ main {
   &__form {
     align-self: normal;
     display: flex;
-    margin: 0 10px 10px 10px;
+    margin: 0 5px 10px 5px;
 
     @media (min-width: 768px) {
-      margin: 10px;
+      margin: 10px 5px;
     }
   }
 
   &__form-input {
     flex: 1 1 0%;
-    margin-right: 10px;
+    margin: 0 5px;
 
     @media (min-width: 768px) {
       width: 200px;
     }
+  }
+
+  &__form-btn {
+    margin: 0 5px;
   }
 }
 
