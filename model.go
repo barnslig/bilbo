@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -142,7 +142,7 @@ func (b *Bilbo) getPageAtCommit(fileName string, withLastCommit bool, commit plu
 		return
 	}
 
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return
 	}
@@ -254,7 +254,7 @@ func (b *Bilbo) updatePage(fileName string, data string, message string) (err er
 
 	// Write to file
 	// TODO configurable permission mode
-	err = ioutil.WriteFile(absPageFilePath, []byte(data), 0644)
+	err = os.WriteFile(absPageFilePath, []byte(data), 0644)
 	if err != nil {
 		return
 	}
