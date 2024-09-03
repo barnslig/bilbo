@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/csrf"
-	"github.com/gorilla/mux"
-	"github.com/patrickmn/go-cache"
-	"gopkg.in/src-d/go-git.v4"
 	"html/template"
 	"log"
 	"net/http"
 	"path"
 	"time"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
+	"github.com/patrickmn/go-cache"
 )
 
 type BilboConfig struct {

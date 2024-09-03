@@ -3,15 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
-	"gopkg.in/russross/blackfriday.v2"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	"io"
 	"net/url"
 	"path"
 	"regexp"
 	"strings"
+
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/russross/blackfriday/v2"
+	"golang.org/x/net/html"
+	"golang.org/x/net/html/atom"
 )
 
 var (

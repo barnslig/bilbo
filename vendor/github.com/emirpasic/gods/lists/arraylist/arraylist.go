@@ -11,14 +11,14 @@ package arraylist
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/emirpasic/gods/lists"
 	"github.com/emirpasic/gods/utils"
-	"strings"
 )
 
-func assertListImplementation() {
-	var _ lists.List = (*List)(nil)
-}
+// Assert List implementation
+var _ lists.List = (*List)(nil)
 
 // List holds the elements in a slice
 type List struct {
@@ -31,9 +31,13 @@ const (
 	shrinkFactor = float32(0.25) // shrink when size is 25% of capacity (0 means never shrink)
 )
 
-// New instantiates a new empty list
-func New() *List {
-	return &List{}
+// New instantiates a new list and adds the passed values, if any, to the list
+func New(values ...interface{}) *List {
+	list := &List{}
+	if len(values) > 0 {
+		list.Add(values...)
+	}
+	return list
 }
 
 // Add appends a value at the end of the list
@@ -56,7 +60,7 @@ func (list *List) Get(index int) (interface{}, bool) {
 	return list.elements[index], true
 }
 
-// Remove removes one or more elements from the list with the supplied indices.
+// Remove removes the element at the given index from the list.
 func (list *List) Remove(index int) {
 
 	if !list.withinRange(index) {
@@ -78,8 +82,8 @@ func (list *List) Contains(values ...interface{}) bool {
 
 	for _, searchValue := range values {
 		found := false
-		for _, element := range list.elements {
-			if element == searchValue {
+		for index := 0; index < list.size; index++ {
+			if list.elements[index] == searchValue {
 				found = true
 				break
 			}
@@ -158,14 +162,24 @@ func (list *List) Insert(index int, values ...interface{}) {
 	l := len(values)
 	list.growBy(l)
 	list.size += l
-	// Shift old to right
-	for i := list.size - 1; i >= index+l; i-- {
-		list.elements[i] = list.elements[i-l]
+	copy(list.elements[index+l:], list.elements[index:list.size-l])
+	copy(list.elements[index:], values)
+}
+
+// Set the value at specified index
+// Does not do anything if position is negative or bigger than list's size
+// Note: position equal to list's size is valid, i.e. append.
+func (list *List) Set(index int, value interface{}) {
+
+	if !list.withinRange(index) {
+		// Append
+		if index == list.size {
+			list.Add(value)
+		}
+		return
 	}
-	// Insert new
-	for i, value := range values {
-		list.elements[index+i] = value
-	}
+
+	list.elements[index] = value
 }
 
 // String returns a string representation of container

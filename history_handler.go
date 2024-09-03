@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"path"
+
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/gorilla/mux"
 )
 
 func (b *Bilbo) HandleHistory(w http.ResponseWriter, r *http.Request) {

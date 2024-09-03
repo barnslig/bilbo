@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
 	"path"
 	"strings"
+
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/gorilla/mux"
 )
 
 func createBreadcrumb(mux *mux.Router, folderPath string) (hierarchy []*Folder, err error) {

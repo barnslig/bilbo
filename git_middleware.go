@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
+
+	"github.com/go-git/go-git/v5/plumbing"
 )
 
 // This middleware adds the to-be-used GIT HEAD to the context.

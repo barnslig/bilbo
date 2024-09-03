@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	"net/http"
+
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/gorilla/mux"
 )
 
 // Retrieve the requested page
