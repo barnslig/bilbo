@@ -27,24 +27,15 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 		return
 	}
 
-	ci, err := b.repo.Log(&git.LogOptions{})
+	ci, err := b.repo.Log(&git.LogOptions{
+		From:     commit,
+		FileName: &fileName,
+	})
 	if err != nil {
 		return
 	}
 
-	var (
-		currentCommit     *object.Commit
-		currentCommitFile *object.File
-		lastCommit        *object.Commit
-		lastCommitFile    *object.File
-	)
-
-	lastCommit, err = ci.Next()
-	if err != nil {
-		return
-	}
-
-	fromCommitSeen := lastCommit.Hash == commit
+	var currentCommit *object.Commit
 
 	for {
 		currentCommit, err = ci.Next()
@@ -57,38 +48,11 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 			return
 		}
 
-		if !fromCommitSeen {
-			if currentCommit.Hash == commit {
-				fromCommitSeen = true
-			} else {
-				continue
-			}
-		}
+		commits = append(commits, currentCommit)
 
-		lastCommitFile, err = lastCommit.File(fileName)
-		if err != nil && err != object.ErrFileNotFound {
+		if onlyLast {
 			break
 		}
-
-		currentCommitFile, err = currentCommit.File(fileName)
-		if err != nil && err != object.ErrFileNotFound {
-			break
-		}
-
-		err = nil
-
-		if (lastCommitFile == nil && currentCommitFile != nil) ||
-			(lastCommitFile != nil && currentCommitFile == nil) ||
-			(lastCommitFile != nil && currentCommitFile != nil && lastCommitFile.Blob.Hash != currentCommitFile.Blob.Hash) {
-			commits = append(commits, lastCommit)
-
-			if onlyLast {
-				b.cache.Set(cacheKey, commits, cache.DefaultExpiration)
-				return
-			}
-		}
-
-		lastCommit = currentCommit
 	}
 
 	b.cache.Set(cacheKey, commits, cache.DefaultExpiration)
