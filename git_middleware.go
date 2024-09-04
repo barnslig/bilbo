@@ -16,14 +16,17 @@ func (b *Bilbo) GitMiddleware(h http.Handler) http.Handler {
 		isHead := false
 		commitHash := plumbing.NewHash(r.URL.Query().Get("commit"))
 
-		if commitHash == plumbing.ZeroHash {
-			head, err := b.repo.Head()
-			if err != nil {
-				return
-			}
+		head, err := b.repo.Head()
+		if err != nil {
+			return
+		}
 
-			isHead = true
+		if commitHash == plumbing.ZeroHash {
 			commitHash = head.Hash()
+		}
+
+		if commitHash == head.Hash() {
+			isHead = true
 		}
 
 		ctx := r.Context()
