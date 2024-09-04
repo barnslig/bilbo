@@ -25,7 +25,7 @@ func (b *Bilbo) HandleEditPreview(w http.ResponseWriter, r *http.Request) {
 		Source:   []byte(data.Data),
 	}
 
-	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	commit := r.Context().Value(key("GitHead")).(plumbing.Hash)
 	err = b.RenderPage(page, commit)
 	if err != nil {
 		panic(err)

@@ -51,7 +51,7 @@ func (b *Bilbo) HandlePages(w http.ResponseWriter, r *http.Request) {
 		folder = vars["folder"]
 	}
 
-	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	commit := r.Context().Value(key("GitHead")).(plumbing.Hash)
 	folderStructure, err := b.getPagesAtCommit(folder, commit)
 	if err != nil {
 		panic(err)

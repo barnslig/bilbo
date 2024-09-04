@@ -14,6 +14,8 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+type key string
+
 type BilboConfig struct {
 	DataDir     string
 	HttpListen  string
@@ -111,7 +113,7 @@ func (b *Bilbo) renderTemplate(w http.ResponseWriter, r *http.Request, templateF
 	data := hash{
 		"csrfToken":      csrf.Token(r),
 		csrf.TemplateTag: csrf.TemplateField(r),
-		"gitIsHead":      r.Context().Value("GitIsHead").(bool),
+		"gitIsHead":      r.Context().Value(key("GitIsHead")).(bool),
 	}
 
 	// Merge the local template data with the global one

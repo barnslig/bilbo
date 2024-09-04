@@ -22,7 +22,7 @@ func (b *Bilbo) HandleHistory(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, redirectUrl.String(), http.StatusMovedPermanently)
 	}
 
-	commit := r.Context().Value("GitHead").(plumbing.Hash)
+	commit := r.Context().Value(key("GitHead")).(plumbing.Hash)
 	pageHistory, err := b.getPageHistoryFromCommit(vars["page"]+".md", false, commit)
 	if err != nil {
 		panic(err)

@@ -27,8 +27,8 @@ func (b *Bilbo) GitMiddleware(h http.Handler) http.Handler {
 		}
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, "GitHead", commitHash)
-		ctx = context.WithValue(ctx, "GitIsHead", isHead)
+		ctx = context.WithValue(ctx, key("GitHead"), commitHash)
+		ctx = context.WithValue(ctx, key("GitIsHead"), isHead)
 		h.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
