@@ -98,6 +98,7 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	// Apply middlewares
 	b.hndl = RecoverMiddleware(b.mux)
 	b.hndl = b.GitMiddleware(b.hndl)
+	b.hndl = b.AuthorMiddleware(b.hndl)
 	b.hndl = csrf.Protect([]byte(b.cfg.Secret), csrf.Secure(false))(b.hndl)
 
 	log.Printf("Now listening on http://%s", b.cfg.HttpListen)

@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"html/template"
 	"io"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type EditData struct {
@@ -26,7 +27,9 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		err = b.updatePage(vars["page"], data.Data, data.Message)
+		author := r.Context().Value(key("GitAuthor")).(GitAuthor)
+
+		err = b.updatePage(vars["page"], data.Data, data.Message, author)
 		if err != nil {
 			panic(err)
 		}

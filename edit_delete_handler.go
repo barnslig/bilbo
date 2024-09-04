@@ -13,7 +13,9 @@ func (b *Bilbo) HandleEditDelete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method == "POST" {
-		err = b.deletePage(page.Filepath, fmt.Sprintf("Deleted %s", path.Base(page.Filepath)))
+		author := r.Context().Value(key("GitAuthor")).(GitAuthor)
+
+		err = b.deletePage(page.Filepath, fmt.Sprintf("Deleted %s", path.Base(page.Filepath)), author)
 		if err != nil {
 			panic(err)
 		}

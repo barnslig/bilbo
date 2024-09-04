@@ -206,7 +206,7 @@ func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (folde
 	return
 }
 
-func (b *Bilbo) updatePage(fileName string, data string, message string) (err error) {
+func (b *Bilbo) updatePage(fileName string, data string, message string, author GitAuthor) (err error) {
 	// Make sure the file has an extension
 	pageFilePath := ensureFileNameHasExtension(fileName)
 
@@ -235,11 +235,10 @@ func (b *Bilbo) updatePage(fileName string, data string, message string) (err er
 	}
 
 	// Create commit
-	// TODO author from config
 	_, err = wt.Commit(message, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Anonymous",
-			Email: "anon@anon.com",
+			Name:  author.Name,
+			Email: author.Email,
 			When:  time.Now(),
 		},
 	})
@@ -247,7 +246,7 @@ func (b *Bilbo) updatePage(fileName string, data string, message string) (err er
 	return
 }
 
-func (b *Bilbo) movePage(currentFileName string, nextFileName string, message string) (err error) {
+func (b *Bilbo) movePage(currentFileName string, nextFileName string, message string, author GitAuthor) (err error) {
 	// Make sure both files are within our data dir
 	absCurrentFileName, err := ensureSaveFilePath(currentFileName, b.cfg.DataDir, false)
 	if err != nil {
@@ -274,11 +273,10 @@ func (b *Bilbo) movePage(currentFileName string, nextFileName string, message st
 	}
 
 	// Create commit
-	// TODO author from config
 	_, err = wt.Commit(message, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Anonymous",
-			Email: "anon@anon.com",
+			Name:  author.Name,
+			Email: author.Email,
 			When:  time.Now(),
 		},
 	})
@@ -286,7 +284,7 @@ func (b *Bilbo) movePage(currentFileName string, nextFileName string, message st
 	return
 }
 
-func (b *Bilbo) deletePage(fileName string, message string) (err error) {
+func (b *Bilbo) deletePage(fileName string, message string, author GitAuthor) (err error) {
 	// Make sure file is within our data dir
 	absFileName, err := ensureSaveFilePath(fileName, b.cfg.DataDir, false)
 	if err != nil {
@@ -305,11 +303,10 @@ func (b *Bilbo) deletePage(fileName string, message string) (err error) {
 	}
 
 	// Create commit
-	// TODO author from config
 	_, err = wt.Commit(message, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Anonymous",
-			Email: "anon@anon.com",
+			Name:  author.Name,
+			Email: author.Email,
 			When:  time.Now(),
 		},
 	})

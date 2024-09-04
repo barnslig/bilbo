@@ -26,7 +26,9 @@ func (b *Bilbo) HandleEditRename(w http.ResponseWriter, r *http.Request) {
 			nextPageFilepath = nextPageFilepath + path.Ext(currentPage.Filepath)
 		}
 
-		err = b.movePage(currentPage.Filepath, nextPageFilepath, fmt.Sprintf("Renamed %s", path.Base(nextPageFilepath)))
+		author := r.Context().Value(key("GitAuthor")).(GitAuthor)
+
+		err = b.movePage(currentPage.Filepath, nextPageFilepath, fmt.Sprintf("Renamed %s", path.Base(nextPageFilepath)), author)
 		if err != nil {
 			panic(err)
 		}
