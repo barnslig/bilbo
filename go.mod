@@ -6,6 +6,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/mux v1.8.1
+	github.com/olivere/vite v0.0.0-20240914084000-a33480a25612
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/russross/blackfriday/v2 v2.1.0
 	golang.org/x/net v0.28.0

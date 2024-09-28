@@ -1,0 +1,166 @@
+.m-editor-header {
+  align-items: flex-start;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  @media (min-width: 768px) {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  &__nav {
+    display: flex;
+    width: 100%;
+    padding: 10px 5px;
+  }
+
+  &__nav-btn {
+    margin: 0 5px;
+  }
+
+  &__nav-btn-preview {
+    @media (min-width: 768px) {
+      display: none;
+    }
+  }
+
+  .o-editor--show-preview &__nav-btn-preview-preview {
+    display: none;
+  }
+
+  &__nav-btn-preview-editor {
+    display: none;
+  }
+
+  .o-editor--show-preview &__nav-btn-preview-editor {
+    display: inline;
+  }
+
+  &__loader {
+    animation: m-editor-header__loader 0.5s infinite;
+    border-color: #000 transparent #000 transparent;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 5px;
+    color: black;
+    height: 25px;
+    margin: 2.5px auto;
+    visibility: hidden;
+    width: 25px;
+
+    @media (min-width: 768px) {
+      margin: 2.5px;
+    }
+
+    &--visible {
+      visibility: visible;
+    }
+  }
+
+  &__form {
+    align-self: normal;
+    display: flex;
+    margin: 0 5px 10px 5px;
+
+    @media (min-width: 768px) {
+      margin: 10px 5px;
+    }
+  }
+
+  &__form-input {
+    flex: 1 1 0%;
+    margin: 0 5px;
+
+    @media (min-width: 768px) {
+      width: 200px;
+    }
+  }
+
+  &__form-btn {
+    margin: 0 5px;
+  }
+}
+
+@keyframes m-editor-header__loader {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.o-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  &__sidebyside {
+    display: flex;
+    flex: 1 1 0%;
+    overflow: hidden;
+  }
+
+  &__editor,
+  &__preview {
+    flex: 1 0 50%;
+    overflow: auto;
+  }
+
+  &--show-preview &__editor {
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  &__preview {
+    display: none;
+    padding: 20px 50px;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
+
+    .a-hl__anchor {
+      display: none;
+    }
+  }
+
+  &--show-preview &__preview {
+    @media (max-width: 767px) {
+      display: block;
+    }
+  }
+
+  textarea {
+    background: #272822;
+    border: 0;
+    color: #f8f8f2;
+    font-family: monospace;
+    font-size: 16px;
+    height: 100%;
+    line-height: 1.5;
+    overflow: hidden;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .CodeMirror {
+    height: 100%;
+    font-size: 16px;
+
+    &-lines {
+      padding: 15px 0;
+    }
+
+    &-line {
+      padding: 0 15px 0 0;
+    }
+
+    &-gutter-elt {
+      padding: 0 15px;
+    }
+  }
+}

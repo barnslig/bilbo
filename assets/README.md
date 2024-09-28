@@ -1,8 +1,10 @@
 # Bilbo's assets
+
 This folder contains source files of JS and CSS.
 
 ## Compilation
-Make sure to have a working node+yarn setup. Then:
 
-    yarn
-    yarn build
+Make sure to have a working node setup. Then:
+
+    npm install
+    npm run build

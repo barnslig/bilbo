@@ -1,3 +1,5 @@
+import './app.scss';
+
 const $editor = document.querySelector('[data-editor]');
 if ($editor) {
   import(/* webpackChunkName: "editor" */ './editor')

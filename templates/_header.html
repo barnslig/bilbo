@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{$.csrfToken}}" />
     <meta name="viewport" content="width=device-width" />
     <title>{{$.pageTitle}}</title>
-    <link rel="stylesheet" href="/static/app.css" />
+    {{$.Vite.Tags}}
   </head>
   <body class="l-{{$.pageLayout}}">
     <a class="a-aria-skip" href="#main">Skip to main content</a>

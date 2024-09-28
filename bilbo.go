@@ -1,36 +1,47 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/olivere/vite"
 	"github.com/patrickmn/go-cache"
 )
+
+//go:embed all:assets/dist
+var assets embed.FS
+
+//go:embed all:templates
+var templates embed.FS
 
 type key string
 
 type BilboConfig struct {
-	DataDir     string
-	HttpListen  string
-	Secret      string
-	StaticDir   string
-	TemplateDir string
+	DataDir    string
+	HttpListen string
+	IsDev      bool
+	Secret     string
 }
 
 type Bilbo struct {
-	cache *cache.Cache
-	cfg   BilboConfig
-	hndl  http.Handler
-	mux   *mux.Router
-	repo  *git.Repository
-	tmpl  *template.Template
+	assetFs fs.FS
+	cache   *cache.Cache
+	cfg     BilboConfig
+	hndl    http.Handler
+	mux     *mux.Router
+	repo    *git.Repository
+	tmpl    *template.Template
+	tmplFs  fs.FS
 }
 
 func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
@@ -43,6 +54,18 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	}
 	if err != nil {
 		return
+	}
+
+	if b.cfg.IsDev {
+		b.assetFs = os.DirFS("assets/src/")
+	} else {
+		b.assetFs, _ = fs.Sub(assets, "assets/dist")
+	}
+
+	if b.cfg.IsDev {
+		b.tmplFs = os.DirFS("templates")
+	} else {
+		b.tmplFs, _ = fs.Sub(templates, "templates")
 	}
 
 	// Precompile templates
@@ -72,7 +95,8 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 			return cleanRouteStr
 		},
 	}
-	b.tmpl = template.Must(template.New("").Funcs(tmplFuncMap).ParseGlob(path.Join(b.cfg.TemplateDir, "*.html")))
+
+	b.tmpl = template.Must(template.New("").Funcs(tmplFuncMap).ParseFS(b.tmplFs, "*.html"))
 
 	// Create cache
 	b.cache = cache.New(time.Hour, 10*time.Minute)
@@ -81,7 +105,7 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 	b.mux = mux.NewRouter()
 	b.mux.HandleFunc("/", b.HandleIndex).Methods("GET").Name("index")
 
-	b.mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(b.cfg.StaticDir))))
+	b.mux.PathPrefix("/assets/").Handler(http.FileServer(http.FS(b.assetFs)))
 	b.mux.HandleFunc("/{special:favicon|favicon.ico}", http.NotFound)
 
 	b.mux.HandleFunc("/edit/_new/{folder:.*}", b.HandleEditNew).Methods("GET", "POST").Name("pages#new")
@@ -110,11 +134,23 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 type hash map[string]interface{}
 
 func (b *Bilbo) renderTemplate(w http.ResponseWriter, r *http.Request, templateFile string, localData hash) {
+	viteFragment, err := vite.HTMLFragment(vite.Config{
+		FS:           b.assetFs,
+		IsDev:        b.cfg.IsDev,
+		ViteEntry:    "src/app.js",
+		ViteTemplate: vite.Vanilla,
+	})
+
+	if err != nil {
+		panic(err)
+	}
+
 	// Global template data
 	data := hash{
 		"csrfToken":      csrf.Token(r),
 		csrf.TemplateTag: csrf.TemplateField(r),
 		"gitIsHead":      r.Context().Value(key("GitIsHead")).(bool),
+		"Vite":           viteFragment,
 	}
 
 	// Merge the local template data with the global one

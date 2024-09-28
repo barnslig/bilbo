@@ -5,6 +5,8 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/gfm/gfm';
 import 'codemirror/theme/monokai.css';
 
+import './editor.scss';
+
 Axios.defaults.headers.post['X-CSRF-Token'] =
   document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
