@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gorilla/mux"
-	"github.com/patrickmn/go-cache"
 	"html/template"
 	"io"
 	"net/http"
 	"path"
+
+	"github.com/gorilla/mux"
 )
 
 func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
@@ -33,17 +32,9 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	cacheKey := fmt.Sprintf("page-%s-%s", page.Filepath, commit)
-	cachedPage, found := b.cache.Get(cacheKey)
-	if found {
-		page = cachedPage.(*Page)
-	} else {
-		err = b.RenderPage(page)
-		if err != nil {
-			panic(err)
-		}
-
-		b.cache.Set(cacheKey, page, cache.DefaultExpiration)
+	err = b.RenderPage(page, true)
+	if err != nil {
+		panic(err)
 	}
 
 	pageFolder := path.Dir(page.Linkpath)

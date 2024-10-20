@@ -32,7 +32,7 @@ func (b *Bilbo) HandleEditPreview(w http.ResponseWriter, r *http.Request) {
 		Source:   []byte(data.Data),
 	}
 
-	err = b.RenderPage(page)
+	err = b.RenderPage(page, false)
 	if err != nil {
 		panic(err)
 	}

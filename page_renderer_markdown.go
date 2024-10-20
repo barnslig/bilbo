@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"html"
 	"net/url"
 	"strings"
@@ -75,6 +76,10 @@ func extractTitle(doc ast.Node, source []byte) (title string, err error) {
 		return ast.WalkContinue, nil
 	})
 
+	if len(title) == 0 {
+		err = errors.New("title not found")
+	}
+
 	return
 }
 
@@ -118,7 +123,10 @@ func (r *markdownPageRenderer) Render(page *Page) (err error) {
 		return
 	}
 
-	page.Title, _ = extractTitle(doc, page.Source)
+	if title, err := extractTitle(doc, page.Source); err == nil {
+		page.Title = title
+	}
+
 	page.Rendered = buf.Bytes()
 
 	return
