@@ -126,6 +126,7 @@ func (b *Bilbo) getPageAtCommit(fileName string, withLastCommit bool, commit plu
 
 	// Create page
 	page = &Page{
+		Commit:     obj,
 		LastCommit: lastCommit,
 		Filepath:   file.Name,
 		Linkpath:   normalizePageLink(fileLink, true),

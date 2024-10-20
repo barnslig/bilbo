@@ -38,7 +38,7 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 	if found {
 		page = cachedPage.(*Page)
 	} else {
-		err = b.RenderPage(page, commit)
+		err = b.RenderPage(page)
 		if err != nil {
 			panic(err)
 		}

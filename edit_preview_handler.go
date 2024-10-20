@@ -20,13 +20,19 @@ func (b *Bilbo) HandleEditPreview(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
+	commit := r.Context().Value(key("GitHead")).(plumbing.Hash)
+	commitObj, err := b.repo.CommitObject(commit)
+	if err != nil {
+		return
+	}
+
 	page := &Page{
+		Commit:   commitObj,
 		Filepath: data.Filepath,
 		Source:   []byte(data.Data),
 	}
 
-	commit := r.Context().Value(key("GitHead")).(plumbing.Hash)
-	err = b.RenderPage(page, commit)
+	err = b.RenderPage(page)
 	if err != nil {
 		panic(err)
 	}

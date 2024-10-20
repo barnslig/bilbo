@@ -5,6 +5,7 @@ import (
 )
 
 type Page struct {
+	Commit     *object.Commit
 	LastCommit *object.Commit
 	Filepath   string
 	Linkpath   string
