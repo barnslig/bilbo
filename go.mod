@@ -8,8 +8,8 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/olivere/vite v0.0.0-20240914084000-a33480a25612
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/russross/blackfriday/v2 v2.1.0
-	golang.org/x/net v0.28.0
+	github.com/yuin/goldmark v1.7.8
+	go.abhg.dev/goldmark/anchor v0.1.1
 )
 
 require (
@@ -31,6 +31,7 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
+	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/tools v0.13.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

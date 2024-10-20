@@ -2,174 +2,122 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io"
+	"html"
 	"net/url"
 	"path"
-	"regexp"
 	"strings"
 
+	"github.com/barnslig/bilbo/goldmark/wikitag"
 	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/russross/blackfriday/v2"
-	"golang.org/x/net/html"
-	"golang.org/x/net/html/atom"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/ast"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/text"
+	"github.com/yuin/goldmark/util"
+	"go.abhg.dev/goldmark/anchor"
 )
 
-var (
-	headlineRegex = regexp.MustCompile(`^(?i)h[0-9]$`)
-	linkRegex     = regexp.MustCompile(`\[\[(.+)\|(.+)\]\]|\[\[(.+)\]\]`)
-)
-
-func htmlNodeExtractString(n *html.Node) (str string) {
-	var (
-		b strings.Builder
-		f func(*html.Node)
-	)
-	f = func(n *html.Node) {
-		if n.Type == html.TextNode {
-			b.WriteString(n.Data)
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
-		}
-	}
-	f(n)
-
-	return b.String()
+type wikiTagResolver struct {
+	pageExists func(path string) bool
 }
 
-func htmlNodeGetAttributeByKey(n *html.Node, key string) (val string, err error) {
-	for _, attr := range n.Attr {
-		if attr.Key == key {
-			val = attr.Val
-			return
-		}
+func (r *wikiTagResolver) Resolve(w util.BufWriter, n *wikitag.Node) (err error) {
+	c := strings.SplitN(string(n.Content), "|", 2)
+
+	label := html.EscapeString(c[0])
+
+	target := c[0]
+	if len(c) == 2 {
+		target = c[1]
 	}
 
-	err = fmt.Errorf("Unknown attribute %s", key)
-	return
-}
-
-func (b *Bilbo) RenderPage(page *Page, commit plumbing.Hash) (err error) {
-	// Render the page according to its extension
-	ext := path.Ext(page.Filepath)
-	switch ext {
-	case ".md", ".markdown":
-		extensions := blackfriday.NoIntraEmphasis | blackfriday.Tables | blackfriday.FencedCode | blackfriday.Strikethrough | blackfriday.SpaceHeadings | blackfriday.AutoHeadingIDs | blackfriday.HeadingIDs | blackfriday.BackslashLineBreak | blackfriday.DefinitionLists
-		page.Rendered = blackfriday.Run(page.Source, blackfriday.WithExtensions(extensions))
-	default:
-		page.Rendered = page.Source
-	}
-
-	doc, err := html.Parse(bytes.NewReader(page.Rendered))
+	link, err := url.Parse(target)
 	if err != nil {
 		return
 	}
 
-	firstHeadlineFound := false
+	classes := "external"
+	if !link.IsAbs() {
+		classes = "internal"
+		link.Path = normalizePageLink(link.Path, true)
 
-	var f func(*html.Node)
-	f = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.DataAtom == atom.Body {
-			// blackfriday wraps the rendered HTML with <html><body> etc, remove it
-			n.DataAtom = atom.Article
-			n.Data = "article"
-			doc = n
-		}
-
-		if n.Type == html.ElementNode && !firstHeadlineFound && n.DataAtom == atom.H1 {
-			// Extract text from first headline node
-			firstHeadlineFound = true
-			page.Title = htmlNodeExtractString(n)
-		}
-
-		if n.Type == html.ElementNode && headlineRegex.MatchString(n.Data) {
-			// Prepend anchor link to headlines
-			id, err := htmlNodeGetAttributeByKey(n, "id")
-			if err != nil {
-				return
-			}
-
-			n.Attr = append(n.Attr, html.Attribute{Key: "class", Val: "a-hl"})
-
-			linkNode := &html.Node{
-				Type:     html.ElementNode,
-				DataAtom: atom.A,
-				Data:     "a",
-				Attr: []html.Attribute{
-					{Key: "class", Val: "a-hl__anchor"},
-					{Key: "href", Val: "#" + id},
-					{Key: "title", Val: "Set anchor to \"" + htmlNodeExtractString(n) + "\""},
-				},
-			}
-			linkNode.AppendChild(&html.Node{
-				Type: html.TextNode,
-				Data: "🔗",
-			})
-
-			n.InsertBefore(linkNode, n.FirstChild)
-		}
-
-		if n.Type == html.TextNode {
-			// Gollum-Style link tags https://github.com/gollum/gollum/wiki#link-tag
-			match := linkRegex.FindAllStringSubmatch(n.Data, 3)
-			if match != nil {
-				hasTitle := match[0][3] == ""
-
-				rawTitle := match[0][1]
-				if !hasTitle {
-					rawTitle = match[0][3]
-				}
-
-				rawLink := match[0][2]
-				if !hasTitle {
-					rawLink = match[0][3]
-				}
-
-				link, err := url.Parse(rawLink)
-				if err != nil {
-					return
-				}
-
-				classes := "external"
-				if !link.IsAbs() {
-					classes = "internal"
-					link.Path = normalizePageLink(link.Path, true)
-
-					if _, err := b.getPageAtCommit(link.Path, false, commit); err != nil {
-						classes = "internal absent"
-					}
-				}
-
-				linkNode := &html.Node{
-					Type:     html.ElementNode,
-					DataAtom: atom.A,
-					Data:     "a",
-					Attr: []html.Attribute{
-						{Key: "class", Val: classes},
-						{Key: "href", Val: link.String()},
-					},
-				}
-				linkNode.AppendChild(&html.Node{
-					Type: html.TextNode,
-					Data: rawTitle,
-				})
-
-				n.Parent.InsertBefore(linkNode, n)
-				n.Parent.RemoveChild(n)
-			}
-		}
-
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			f(c)
+		if !r.pageExists(link.Path) {
+			classes = "internal absent"
 		}
 	}
-	f(doc)
 
-	var buf bytes.Buffer
-	w := io.Writer(&buf)
-	html.Render(w, doc)
-	page.Rendered = buf.Bytes()
+	w.WriteString("<a href=\"")
+	w.WriteString(link.String())
+	w.WriteString("\" class=\"")
+	w.WriteString(classes)
+	w.WriteString("\">")
+	w.WriteString(label)
+	w.WriteString("</a>")
+
+	return nil
+}
+
+func extractTitle(doc ast.Node, source []byte) (title string, err error) {
+	err = ast.Walk(doc, func(n ast.Node, entering bool) (ast.WalkStatus, error) {
+		if !entering {
+			return ast.WalkContinue, nil
+		}
+
+		node, ok := n.(*ast.Heading)
+		if !ok {
+			return ast.WalkContinue, nil
+		}
+
+		if node.Level == 1 {
+			title = string(node.Text(source))
+			return ast.WalkStop, nil
+		}
+
+		return ast.WalkContinue, nil
+	})
+
+	return
+}
+
+func (b *Bilbo) RenderPage(page *Page, commit plumbing.Hash) (err error) {
+	md := goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM,
+			&anchor.Extender{
+				Texter: anchor.Text("#"),
+			},
+			wikitag.NewWikiTag(wikitag.WikiTagConfig{
+				Resolver: &wikiTagResolver{
+					pageExists: func(path string) bool {
+						_, err := b.getPageAtCommit(path, false, commit)
+						return err != nil
+					},
+				},
+			}),
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+	)
+
+	// Render the page according to its extension
+	ext := path.Ext(page.Filepath)
+	switch ext {
+	case ".md", ".markdown":
+		doc := md.Parser().Parse(text.NewReader(page.Source))
+
+		var buf bytes.Buffer
+		err = md.Renderer().Render(&buf, page.Source, doc)
+		if err != nil {
+			return
+		}
+
+		page.Title, _ = extractTitle(doc, page.Source)
+		page.Rendered = buf.Bytes()
+	default:
+		page.Rendered = page.Source
+	}
 
 	return
 }
