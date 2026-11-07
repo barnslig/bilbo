@@ -10,8 +10,7 @@ version: 2
 
 before:
   hooks:
-    - cd assets; npm install; npm run build
-    # You may remove this if you don't use go modules.
+    - sh -c "cd assets; npm install; npm run build"
     - go mod tidy
 
 builds:
