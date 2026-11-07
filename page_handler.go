@@ -20,13 +20,15 @@ func (b *Bilbo) HandlePage(w http.ResponseWriter, r *http.Request) {
 		}
 
 		http.Redirect(w, r, redirectUrl.String(), http.StatusMovedPermanently)
+		return
 	}
 
-	page, commit, err := b.getRequestedPage(r)
+	page, _, err := b.getRequestedPage(r)
 	if err != nil {
 		if err == io.EOF {
 			redirectUrl, _ := b.mux.Get("pages#edit").URL("page", normalizePageLink(vars["page"], true))
 			http.Redirect(w, r, redirectUrl.String(), http.StatusSeeOther)
+			return
 		} else {
 			panic(err)
 		}
