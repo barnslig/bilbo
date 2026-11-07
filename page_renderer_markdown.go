@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"html"
 	"net/url"
 	"strings"
@@ -83,6 +84,15 @@ func extractTitle(doc ast.Node, source []byte) (title string, err error) {
 	return
 }
 
+type anchorAttributor struct{}
+
+func (aa anchorAttributor) AnchorAttributes(headerInfo *anchor.HeaderInfo) map[string]string {
+	return map[string]string{
+		"class": "a-hl-anchor",
+		"title": fmt.Sprintf("Set anchor to \"%s\"", headerInfo.ID),
+	}
+}
+
 type MarkdownPageRendererOptions struct {
 	pageExists func(path string) bool
 }
@@ -96,7 +106,8 @@ func NewMarkdownPageRenderer(options MarkdownPageRendererOptions) PageRenderer {
 		goldmark.WithExtensions(
 			extension.GFM,
 			&anchor.Extender{
-				Texter: anchor.Text("#"),
+				Texter:     anchor.Text("🔗"),
+				Attributer: anchorAttributor{},
 			},
 			wikitag.NewWikiTag(wikitag.WikiTagConfig{
 				Resolver: &wikiTagResolver{
