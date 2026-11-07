@@ -1,3 +1,5 @@
 .DS_Store
 bilbo
 data/
+# Added by goreleaser init:
+dist/
