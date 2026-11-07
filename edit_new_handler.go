@@ -1,18 +1,19 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 	"path"
+
+	"github.com/gorilla/mux"
 )
 
 func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		folder := r.FormValue("page-folder")
+	vars := mux.Vars(r)
 
+	if r.Method == "POST" {
 		name := r.FormValue("page-name")
 		if !path.IsAbs(name) {
-			name = path.Join(folder, name)
+			name = path.Join(vars["folder"], name)
 		}
 		name = normalizePageLink(name, true)
 
@@ -25,7 +26,6 @@ func (b *Bilbo) HandleEditNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	vars := mux.Vars(r)
 	folder := normalizePageLink(vars["folder"], true)
 
 	b.renderTemplate(w, r, "edit_new.html", hash{

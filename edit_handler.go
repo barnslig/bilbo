@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"path"
 
 	"github.com/gorilla/mux"
 )
@@ -61,6 +62,7 @@ func (b *Bilbo) HandleEdit(w http.ResponseWriter, r *http.Request) {
 	b.renderTemplate(w, r, "edit.html", hash{
 		"commitMsg":  commitMsg,
 		"isNewPage":  isNewPage,
+		"folder":     path.Dir(page.Linkpath),
 		"page":       page,
 		"pageLayout": "editor",
 		"pageTitle":  commitMsg,

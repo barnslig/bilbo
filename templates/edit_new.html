@@ -1,9 +1,8 @@
 {{template "header" $}}
 
 <main id="main">
-  <form class="o-form" method="post" action="{{route "pages#new"}}">
+  <form class="o-form" method="post" action="{{route "pages#new" "folder" $.folder}}">
     {{$.csrfField}}
-    <input type="hidden" name="page-folder" value="{{$.folder}}" />
 
     <div class="o-form__row">
       <div class="a-input">
