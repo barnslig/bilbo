@@ -12,6 +12,9 @@ type Renderer struct {
 	// Position specifies where in the header text
 	// the anchor is being added.
 	Position Position
+	// Unsafe specifies whether the Texter values will be HTML escaped or
+	// not.
+	Unsafe bool
 }
 
 var _ renderer.NodeRenderer = (*Renderer)(nil)
@@ -23,7 +26,7 @@ func (r *Renderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 
 // RenderNode renders an anchor node.
 // Goldmark will invoke this method when it encounters a Node.
-func (r *Renderer) RenderNode(w util.BufWriter, src []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
+func (r *Renderer) RenderNode(w util.BufWriter, _ []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	// If position is Before, we need to add the anchor when entering;
 	// otherwise when exiting.
 	if (r.Position == Before) != entering {
@@ -37,18 +40,24 @@ func (r *Renderer) RenderNode(w util.BufWriter, src []byte, node ast.Node, enter
 
 	// Add leading/trailing ' ' depending on position.
 	if r.Position == Before {
-		defer w.WriteByte(' ')
+		defer func() {
+			_ = w.WriteByte(' ')
+		}()
 	} else {
-		w.WriteByte(' ')
+		_ = w.WriteByte(' ')
 	}
 
-	w.WriteString("<a")
+	_, _ = w.WriteString("<a")
 	html.RenderAttributes(w, node, nil)
-	w.WriteString(` href="#`)
-	w.Write(util.EscapeHTML(n.ID))
-	w.WriteString(`">`)
-	w.Write(util.EscapeHTML(n.Value))
-	w.WriteString("</a>")
+	_, _ = w.WriteString(` href="#`)
+	_, _ = w.Write(util.EscapeHTML(n.ID))
+	_, _ = w.WriteString(`">`)
+	if r.Unsafe {
+		_, _ = w.Write(n.Value)
+	} else {
+		_, _ = w.Write(util.EscapeHTML(n.Value))
+	}
+	_, _ = w.WriteString("</a>")
 
 	return ast.WalkContinue, nil
 }

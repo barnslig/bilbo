@@ -9,6 +9,10 @@ that adds support for anchors next to all headers.
 
   [goldmark]: http://github.com/yuin/goldmark
 
+**Demo**:
+A web-based demonstration of the extension is available at
+<https://abhinav.github.io/goldmark-anchor/demo/>.
+
 ## Installation
 
 ```bash
@@ -169,4 +173,4 @@ heading IDs next to each heading.
 
 ## License
 
-This software is made available under the MIT license.
+This software is made available under the BSD3 license.

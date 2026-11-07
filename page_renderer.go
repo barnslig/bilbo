@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"path"
-
-	"github.com/patrickmn/go-cache"
 )
 
 type PageRenderer interface {
@@ -15,9 +13,8 @@ func (b *Bilbo) RenderPage(page *Page, enableCache bool) (err error) {
 	cacheKey := fmt.Sprintf("page-%s-%s", page.Filepath, page.Commit.Hash)
 
 	if enableCache {
-		c, found := b.cache.Get(cacheKey)
+		cachedPage, found := b.pageCache.Get(cacheKey)
 		if found {
-			cachedPage := c.(*Page)
 			page.Title = cachedPage.Title
 			page.Rendered = cachedPage.Rendered
 			return
@@ -40,7 +37,7 @@ func (b *Bilbo) RenderPage(page *Page, enableCache bool) (err error) {
 	}
 
 	if enableCache {
-		b.cache.Set(cacheKey, page, cache.DefaultExpiration)
+		b.pageCache.Set(cacheKey, page)
 	}
 
 	return

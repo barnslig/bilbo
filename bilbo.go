@@ -12,10 +12,11 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/olivere/vite"
-	"github.com/patrickmn/go-cache"
+	"zgo.at/zcache/v2"
 )
 
 //go:embed all:assets/dist
@@ -35,13 +36,16 @@ type BilboConfig struct {
 
 type Bilbo struct {
 	assetFs fs.FS
-	cache   *cache.Cache
 	cfg     BilboConfig
 	hndl    http.Handler
 	mux     *mux.Router
 	repo    *git.Repository
 	tmpl    *template.Template
 	tmplFs  fs.FS
+
+	pageCache            *zcache.Cache[string, *Page]
+	pageHistoryCache     *zcache.Cache[string, []*object.Commit]
+	folderStructureCache *zcache.Cache[string, *FolderStructure]
 }
 
 func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
@@ -98,8 +102,10 @@ func NewBilbo(cfg BilboConfig) (b *Bilbo, err error) {
 
 	b.tmpl = template.Must(template.New("").Funcs(tmplFuncMap).ParseFS(b.tmplFs, "*.html"))
 
-	// Create cache
-	b.cache = cache.New(time.Hour, 10*time.Minute)
+	// Create caches
+	b.pageCache = zcache.New[string, *Page](time.Hour, 10*time.Minute)
+	b.pageHistoryCache = zcache.New[string, []*object.Commit](time.Hour, 10*time.Minute)
+	b.folderStructureCache = zcache.New[string, *FolderStructure](time.Hour, 10*time.Minute)
 
 	// Create HTTP routes
 	b.mux = mux.NewRouter()

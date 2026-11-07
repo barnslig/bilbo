@@ -129,7 +129,7 @@ var _ parser.ASTTransformer = (*Transformer)(nil)
 //
 // This method is typically called by Goldmark
 // and should not need to be invoked directly.
-func (t *Transformer) Transform(doc *ast.Document, reader text.Reader, pctx parser.Context) {
+func (t *Transformer) Transform(doc *ast.Document, _ text.Reader, _ parser.Context) {
 	tr := transform{
 		Attributer: t.Attributer,
 		Position:   t.Position,
@@ -142,7 +142,8 @@ func (t *Transformer) Transform(doc *ast.Document, reader text.Reader, pctx pars
 		tr.Texter = _defaultTexter
 	}
 
-	ast.Walk(doc, tr.Visit)
+	_ = ast.Walk(doc, tr.Visit)
+	// Visit always returns a nil error.
 }
 
 // transform holds state for a single transformation traversal.

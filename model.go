@@ -13,7 +13,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/filemode"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/patrickmn/go-cache"
 )
 
 func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit plumbing.Hash) (commits []*object.Commit, err error) {
@@ -21,9 +20,8 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 	cacheKey := fmt.Sprintf("getPageHistoryFromCommit-%s-%t-%s", fileName, onlyLast, commit)
 
 	// Try to retrieve page from cache
-	cachedCommits, found := b.cache.Get(cacheKey)
+	commits, found := b.pageHistoryCache.Get(cacheKey)
 	if found {
-		commits = cachedCommits.([]*object.Commit)
 		return
 	}
 
@@ -55,7 +53,7 @@ func (b *Bilbo) getPageHistoryFromCommit(fileName string, onlyLast bool, commit 
 		}
 	}
 
-	b.cache.Set(cacheKey, commits, cache.DefaultExpiration)
+	b.pageHistoryCache.Set(cacheKey, commits)
 	return
 }
 
@@ -64,9 +62,8 @@ func (b *Bilbo) getPageAtCommit(fileName string, withLastCommit bool, commit plu
 	cacheKey := fmt.Sprintf("getPageAtCommit-%s-%t-%s", fileName, withLastCommit, commit)
 
 	// Try to retrieve page from cache
-	cachedPage, found := b.cache.Get(cacheKey)
+	page, found := b.pageCache.Get(cacheKey)
 	if found {
-		page = cachedPage.(*Page)
 		return
 	}
 
@@ -135,23 +132,22 @@ func (b *Bilbo) getPageAtCommit(fileName string, withLastCommit bool, commit plu
 	}
 
 	// Cache page
-	b.cache.Set(cacheKey, page, cache.DefaultExpiration)
+	b.pageCache.Set(cacheKey, page)
 
 	return
 }
 
 func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (folderStructure *FolderStructure, err error) {
-	folderStructure = &FolderStructure{}
-
 	// Determine cache key
 	cacheKey := fmt.Sprintf("getPagesAtCommit-%s-%s", folderPath, commit)
 
 	// Try to retrieve directories and pages from cache
-	cachedFolderStructure, found := b.cache.Get(cacheKey)
+	folderStructure, found := b.folderStructureCache.Get(cacheKey)
 	if found {
-		folderStructure = cachedFolderStructure.(*FolderStructure)
 		return
 	}
+
+	folderStructure = &FolderStructure{}
 
 	obj, err := b.repo.CommitObject(commit)
 	if err != nil {
@@ -202,7 +198,7 @@ func (b *Bilbo) getPagesAtCommit(folderPath string, commit plumbing.Hash) (folde
 	}
 
 	// Cache folder structure
-	b.cache.Set(cacheKey, folderStructure, cache.DefaultExpiration)
+	b.folderStructureCache.Set(cacheKey, folderStructure)
 
 	return
 }
